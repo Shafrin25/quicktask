@@ -1,7 +1,12 @@
 "use client";
-
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
+import HowItWorks from "@/components/HowItWorks";
+import Footer from "@/components/Footer";
+import Features from "@/components/Features";
+import CTA from "@/components/CTA";
+import Hero from "@/components/Hero";
+
 
 export default function Home() {
   return (
@@ -47,11 +52,23 @@ export default function Home() {
         </div>
 
         {/* HERO IMAGE CARD */}
-        <div className="bg-white/10 backdrop-blur-lg p-10 rounded-2xl shadow-xl">
-          <div className="h-56 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-xl flex items-center justify-center">
-            <p className="text-white text-xl">QuickTask Dashboard</p>
-          </div>
-        </div>
+       <div className="relative flex justify-center">
+
+  <div className="bg-white/10 backdrop-blur-lg p-6 rounded-3xl shadow-2xl">
+
+    <video
+      className="w-[520px] rounded-2xl"
+      autoPlay
+      loop
+      muted
+      playsInline
+    >
+      <source src="/Video.mp4" type="video/mp4" />
+     </video>
+
+  </div>
+
+</div>
 
       </section>
 
@@ -98,7 +115,11 @@ export default function Home() {
         </div>
 
       </section>
-
+   
+      <Features />
+      <HowItWorks />
+      <CTA />
+      <Footer />
     </main>
   );
 }
