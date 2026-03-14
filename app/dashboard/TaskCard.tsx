@@ -4,8 +4,6 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { CheckCircle2, Calendar } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 type Task = {
   id: string;
@@ -18,26 +16,26 @@ type Task = {
 };
 
 type TaskCardProps = {
-  task: Task
-  lists: any[]
-  isDark: boolean
-  isEditing: boolean
+  task: Task;
+  lists: any[];
+  isDark: boolean;
+  isEditing: boolean;
 
-  editedTitle: string
-  editedDate: string
-  editedPriority: "High" | "Medium" | "Low"
-  editedDescription: string
+  editedTitle: string;
+  editedDate: string;
+  editedPriority: "High" | "Medium" | "Low";
+  editedDescription: string;
 
-  onStartEdit: () => void
-  onEditChange: (value: string) => void
-  onDateChange: (value: string) => void
-  onPriorityChange: (value: "High" | "Medium" | "Low") => void
-  onDescriptionChange: (value: string) => void
+  onStartEdit: () => void;
+  onEditChange: (value: string) => void;
+  onDateChange: (value: string) => void;
+  onPriorityChange: (value: "High" | "Medium" | "Low") => void;
+  onDescriptionChange: (value: string) => void;
 
-  onSave: () => void
-  onCancel: () => void
-  onToggleComplete: () => void
-  onDelete: () => void
+  onSave: () => void;
+  onCancel: () => void;
+  onToggleComplete: () => void;
+  onDelete: () => void;
 };
 
 export default function TaskCard({
@@ -59,25 +57,39 @@ export default function TaskCard({
   onToggleComplete,
   onDelete
 }: TaskCardProps) {
-  const router = useRouter();
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: task.id });
+
   const style = {
-  transform: CSS.Transform.toString(transform),
-  transition,
-  opacity: isDragging ? 0.5 : 1,
-};
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  const handleMoveToList = async (newListId: string) => {
+    try {
+      const { error } = await supabase
+        .from("tasks")
+        .update({ list_id: newListId })
+        .eq("id", task.id);
+
+      if (error) {
+        console.error("Move task error:", error);
+      }
+    } catch (err) {
+      console.error("Move task error:", err);
+    }
+  };
+
   return (
-    
     <div
-  ref={setNodeRef}
-  {...attributes}
-  style={style}
-  className={`flex flex-col gap-3 p-3 md:p-4 rounded border box-border w-full cursor-grab ${
-    isDark ? "border-gray-600 bg-gray-700" : "border-gray-300 bg-gray-50"
-  }`}
->
+      ref={setNodeRef}
+      style={style}
+      className={`flex flex-col gap-3 p-3 md:p-4 rounded border box-border w-full cursor-grab ${
+        isDark ? "border-gray-600 bg-gray-700" : "border-gray-300 bg-gray-50"
+      }`}
+    >
       
 
       {isEditing ? (
@@ -137,12 +149,13 @@ export default function TaskCard({
           <div className="flex-1 w-full">
             <div className="flex items-center gap-2">
 
-  <span
-    {...listeners}
-    className="cursor-grab text-gray-400"
-  >
-    drag
-  </span>
+              <span
+                {...attributes}
+                {...listeners}
+                className="cursor-grab text-gray-400"
+              >
+                drag
+              </span>
               {task.completed && (
                 <CheckCircle2 className="text-green-600 w-5 h-5" />
               )}
@@ -162,24 +175,17 @@ export default function TaskCard({
 )}
               </span>
             </div>
-             <select
-  className="border rounded px-2 py-1 text-sm mt-2"
-  onChange={async (e) => {
-    const newListId = e.target.value;
-
-    await supabase
-  .from("tasks")
-  .update({ list_id: newListId })
-  .eq("id", task.id);
-  }}
->
-  <option value="">Move to list</option>
-  {lists.map((list) => (
-    <option key={list.id} value={list.id}>
-      {list.title}
-    </option>
-  ))}
-</select>
+            <select
+              className="border rounded px-2 py-1 text-sm mt-2"
+              onChange={(e) => handleMoveToList(e.target.value)}
+            >
+              <option value="">Move to list</option>
+              {lists.map((list) => (
+                <option key={list.id} value={list.id}>
+                  {list.title}
+                </option>
+              ))}
+            </select>
             <div className="flex flex-col gap-1 mt-2 text-xs md:text-sm">
               {task.due_date && (
                 <span
